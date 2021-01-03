@@ -1,0 +1,71 @@
+﻿'wxWidgets.exe' (Win32): Loaded 'C:\Users\Sam Campbell\source\repos\wxWidgets\Debug\wxWidgets.exe'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ntdll.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\kernel32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\KernelBase.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\rpcrt4.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\WinSxS\x86_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.488_none_11b1e5df2ffd8627\comctl32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wsock32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shlwapi.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcrt.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ws2_32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\gdi32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\user32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\win32u.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\oleacc.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\gdi32full.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\comdlg32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcp_win.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\uxtheme.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ucrtbase.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\combase.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\combase.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Unloaded 'C:\Windows\SysWOW64\combase.dll'
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\SHCore.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcp140d.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\version.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shell32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msimg32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\vcruntime140d.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ucrtbased.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\advapi32.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sechost.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\winspool.drv'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ole32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\imm32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\kernel.appcore.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\bcryptprimitives.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msctf.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\oleaut32.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\mswsock.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\TextInputFramework.dll'. 
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\CoreUIComponents.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\CoreMessaging.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ntmarta.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\WinTypes.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\WinTypes.dll'. Symbols loaded.
+'wxWidgets.exe' (Win32): Unloaded 'C:\Windows\SysWOW64\WinTypes.dll'
+'wxWidgets.exe' (Win32): Loaded 'C:\Windows\SysWOW64\TextShaping.dll'. 
+The thread 0x3b50 has exited with code 0 (0x0).
+The thread 0x1024 has exited with code 0 (0x0).
+The thread 0x1aa4 has exited with code 0 (0x0).
+The thread 0x4254 has exited with code 0 (0x0).
+Detected memory leaks!
+Dumping objects ->
+{19048} normal block at 0x008E0448, 16 bytes long.
+ Data: <   p            > 02 00 17 70 7F 00 00 01 00 00 00 00 00 00 00 00 
+{12054} normal block at 0x008B96A8, 120 bytes long.
+ Data: <  B             > 84 F3 42 01 01 00 00 00 00 CD CD CD 00 00 00 00 
+{8674} normal block at 0x008CF008, 8 bytes long.
+ Data: <|U=     > 7C 55 3D 01 A8 96 8B 00 
+{6405} normal block at 0x008B49C0, 16 bytes long.
+ Data: <                > 02 00 13 88 00 00 00 00 00 00 00 00 00 00 00 00 
+{6404} normal block at 0x008838F8, 72 bytes long.
+ Data: <0FB H           > 30 46 42 01 48 02 00 00 FF FF FF FF FF FF FF FF 
+{6403} normal block at 0x008CE550, 8 bytes long.
+ Data: <        > B4 BE 8D 00 00 00 00 00 
+{6402} normal block at 0x008CE630, 12 bytes long.
+ Data: <            > 00 00 00 00 00 00 00 00 00 00 00 00 
+{6401} normal block at 0x008DBE60, 156 bytes long.
+ Data: < :B      8      > 88 3A 42 01 00 00 00 00 F8 38 88 00 04 00 00 00 
+Object dump complete.
+The program '[6904] wxWidgets.exe' has exited with code 0 (0x0).
