@@ -1,7 +1,23 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include "LoadRMData.h"
+#include "NetClient.h"
 #include <wx/wx.h>
+
+enum class CustomMsgType : uint32_t
+{
+	ServerAccept,
+	ServerDeny,
+	ServerPing,
+	MessageAll,
+	ServerMessage,
+};
+
+class CustomClient : public netcommon::ClientInterface<CustomMsgType>
+{
+public:
+private:
+};
 
 enum tag
 {
@@ -49,7 +65,7 @@ protected:
 
 	//network things
 	LoadRMData rmd;
-
+	CustomClient client;
 
 	//strings for echo
 	wxString oldString = "";
