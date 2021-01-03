@@ -1,7 +1,5 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "UDPClient.h"
-#include "UDPServer.h"
 #include "LoadRMData.h"
 #include <wx/wx.h>
 
@@ -51,8 +49,6 @@ protected:
 
 	//network things
 	LoadRMData rmd;
-	std::unique_ptr<UDPClient> sender = nullptr;
-	std::unique_ptr<UDPServer> listener = nullptr;
 
 
 	//strings for echo

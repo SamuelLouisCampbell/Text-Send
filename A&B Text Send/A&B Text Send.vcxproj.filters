@@ -24,12 +24,6 @@
     <ClInclude Include="ListsAndColors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UDPServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UDPClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LoadRMData.h">
       <Filter>Header Files</Filter>
     </ClInclude>

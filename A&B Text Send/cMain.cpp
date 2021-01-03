@@ -77,8 +77,8 @@ cMain::cMain()
 	//setup UDP sockets with error checking
 	if (rmd.CheckRMIPGood() && rmd.CheckRMPortsGood() && rmd.FileReadOK())
 	{
-		sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
-		listener = std::make_unique<UDPServer>(rmd.GetServerPort());
+		//sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
+		//listener = std::make_unique<UDPServer>(rmd.GetServerPort());
 		std::stringstream ss; 
 		ss << "Defaults file read OK. Outgoing port: " << rmd.GetClientPort() << " Sending to: "
 			<< rmd.GetIP() << " Listening on port: " << rmd.GetServerPort();
@@ -88,8 +88,8 @@ cMain::cMain()
 	{	
 		rmd.SetIPToDefault();
 		rmd.SetPortToDefault();
-		sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
-		listener = std::make_unique<UDPServer>(rmd.GetServerPort());
+		//sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
+		//listener = std::make_unique<UDPServer>(rmd.GetServerPort());
 		std::stringstream ss;
 		ss << "Problem with ports or IP Addr. Reset to defaults. Outgoing port: " << rmd.GetClientPort() << " Sending to: "
 			<< rmd.GetIP() << " Listening on port: " << rmd.GetServerPort();
@@ -109,7 +109,7 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, 500);
-	sender->UDP_Send(controlMessage + stlstring);
+	//sender->UDP_Send(controlMessage + stlstring);
 	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -123,7 +123,7 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, 500);
-	sender->UDP_Send(controlMessage + stlstring);
+	//sender->UDP_Send(controlMessage + stlstring);
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -137,7 +137,7 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, 500);
-	sender->UDP_Send(controlMessage + stlstring);
+	//sender->UDP_Send(controlMessage + stlstring);
 	font0->SetPointSize(128);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -152,21 +152,21 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	{
 		controlMessage = ListsAndColors::Commands[0]; //null
 		assert(controlMessage.size() == 8u);
-		sender->UDP_Send(controlMessage);
+		///sender->UDP_Send(controlMessage);
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	listener->Recieve();
+	//listener->Recieve();
 	limitStringSize(stlstring, 500);
-	sender->UDP_Send(controlMessage + stlstring);
+	//sender->UDP_Send(controlMessage + stlstring);
 	evt.Skip();
 }
 
 void cMain::OnTimer(wxTimerEvent& evt)
 {
 	//listen for echos every event
-	listener->Recieve();
-	wxString echo = listener->GetNetworkMessageWithInfo();
+	//listener->Recieve();
+	wxString echo = ""; //listener->GetNetworkMessageWithInfo();
 	//check to see if message is unique/new.
 	if (echo != oldString)
 	{
@@ -186,12 +186,12 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		{
 			controlMessage = ListsAndColors::Commands[0]; //null
 			assert(controlMessage.size() == 8u);
-			sender->UDP_Send(controlMessage);
+			//sender->UDP_Send(controlMessage);
 		}
 		// send the string
 		std::string stlstring = std::string(txt0->GetValue().mb_str());
 		limitStringSize(stlstring, 500);
-		sender->UDP_Send(controlMessage + stlstring);
+		//sender->UDP_Send(controlMessage + stlstring);
 	}
 	//update looper
 	loopCounter++;

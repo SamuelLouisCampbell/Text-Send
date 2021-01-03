@@ -152,8 +152,6 @@
     <ClInclude Include="ListsAndColors.h" />
     <ClInclude Include="LoadRMData.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="UDPClient.h" />
-    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp" />
