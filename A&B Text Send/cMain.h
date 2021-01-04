@@ -16,6 +16,16 @@ enum class CustomMsgType : uint32_t
 class CustomClient : public netcommon::ClientInterface<CustomMsgType>
 {
 public:
+	void PingServer()
+	{
+		netcommon::message<CustomMsgType> msg;
+		msg.header.id = CustomMsgType::ServerPing;
+
+		//caution
+		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+		msg << now;
+		m_connection->Send(msg);
+	}
 private:
 };
 

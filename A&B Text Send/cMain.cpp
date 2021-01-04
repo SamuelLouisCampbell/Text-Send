@@ -74,14 +74,14 @@ cMain::cMain()
 
 	timer.Start(5);
 
-	//setup UDP sockets with error checking
-	if (rmd.CheckRMIPGood() && rmd.CheckRMPortsGood() && rmd.FileReadOK())
+	//setup network with error checking
+	if (rmd.FileReadOK() && rmd.CheckRMIPGood() && rmd.CheckRMPortsGood())
 	{
-		//sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
-		//listener = std::make_unique<UDPServer>(rmd.GetServerPort());
+		client.Connect(rmd.GetIP(), rmd.GetServerPort());
+		
 		std::stringstream ss; 
-		ss << "Defaults file read OK. Outgoing port: " << rmd.GetClientPort() << " Sending to: "
-			<< rmd.GetIP() << " Listening on port: " << rmd.GetServerPort();
+		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Listening on port: " << rmd.GetServerPort() << " ";
+		ss << client.GetConnectionInfo();
 		terminal->Append(ss.str());
 	}
 	else
@@ -91,7 +91,7 @@ cMain::cMain()
 		//sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
 		//listener = std::make_unique<UDPServer>(rmd.GetServerPort());
 		std::stringstream ss;
-		ss << "Problem with ports or IP Addr. Reset to defaults. Outgoing port: " << rmd.GetClientPort() << " Sending to: "
+		ss << "Problem with ports or IP Addr. Reset to defaults. Sending to: "
 			<< rmd.GetIP() << " Listening on port: " << rmd.GetServerPort();
 		terminal->Append(ss.str());
 	}
@@ -109,6 +109,11 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, 500);
+	
+	//demo
+	client.PingServer();
+
+
 	//sender->UDP_Send(controlMessage + stlstring);
 	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
 	txt0->SetFont(*font0);
