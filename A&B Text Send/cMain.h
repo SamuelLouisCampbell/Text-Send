@@ -9,8 +9,8 @@ enum class CustomMsgType : uint32_t
 	ServerAccept,
 	ServerDeny,
 	ServerPing,
-	MessageAll,
-	ServerMessage,
+	MessageServer,
+	EchoMessage,
 };
 
 class CustomClient : public netcommon::ClientInterface<CustomMsgType>
@@ -20,12 +20,24 @@ public:
 	{
 		netcommon::message<CustomMsgType> msg;
 		msg.header.id = CustomMsgType::ServerPing;
-
 		//caution
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 		msg << now;
 		m_connection->Send(msg);
 	}
+	void SendMsg(const std::string& messsage)
+	{
+		std::vector<unsigned char> buff;
+		netcommon::message<CustomMsgType> msg;
+		for (auto& c : messsage)
+		{
+			msg << c;
+		}
+		msg.header.id = CustomMsgType::MessageServer;
+		
+		m_connection->Send(msg);
+	}
+
 private:
 };
 

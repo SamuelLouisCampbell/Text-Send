@@ -1,4 +1,4 @@
-[Server Port] #7000
+[Server Port] #60000
 [Server IP] #127.0.0.1
 
 //Do not change this format, or this file won't be read and it probably will crash your session becuase I'm a lazy programmer.

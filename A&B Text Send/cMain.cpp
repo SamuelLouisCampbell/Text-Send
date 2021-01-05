@@ -81,7 +81,7 @@ cMain::cMain()
 		
 		std::stringstream ss; 
 		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Listening on port: " << rmd.GetServerPort() << " ";
-		ss << client.GetConnectionInfo();
+		ss << "Local Information: " << client.GetConnectionInfo();
 		terminal->Append(ss.str());
 	}
 	else
@@ -108,13 +108,8 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[evt.GetId() + 1]; //color
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	limitStringSize(stlstring, 500);
+	client.SendMsg(controlMessage + stlstring);
 	
-	//demo
-	client.PingServer();
-
-
-	//sender->UDP_Send(controlMessage + stlstring);
 	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -127,8 +122,9 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[2]; //small
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	limitStringSize(stlstring, 500);
-	//sender->UDP_Send(controlMessage + stlstring);
+
+	client.SendMsg(controlMessage + stlstring);
+
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -141,8 +137,9 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[1]; //large
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	limitStringSize(stlstring, 500);
-	//sender->UDP_Send(controlMessage + stlstring);
+	
+	client.SendMsg(controlMessage + stlstring);
+
 	font0->SetPointSize(128);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -157,27 +154,56 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	{
 		controlMessage = ListsAndColors::Commands[0]; //null
 		assert(controlMessage.size() == 8u);
-		///sender->UDP_Send(controlMessage);
+		
+		client.SendMsg(controlMessage);
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	//listener->Recieve();
-	limitStringSize(stlstring, 500);
-	//sender->UDP_Send(controlMessage + stlstring);
+
+	client.SendMsg(controlMessage + stlstring);
+
 	evt.Skip();
 }
 
 void cMain::OnTimer(wxTimerEvent& evt)
 {
 	//listen for echos every event
-	//listener->Recieve();
-	wxString echo = ""; //listener->GetNetworkMessageWithInfo();
+	wxString echo;
+	if (client.IsConnected())
+	{
+		if (!client.IncomingMessages().empty())
+		{
+			auto msg = client.IncomingMessages().pop_front().msg;
+
+			switch (msg.header.id)
+			{
+			case CustomMsgType::MessageServer:
+			{
+				for (auto& c : msg.body)
+				{
+					echo += c;
+				}
+				break;
+			}
+			default:
+				client.IncomingMessages().eraseQ();
+				break;
+			}
+		}
+	}
+
 	//check to see if message is unique/new.
 	if (echo != oldString)
 	{
 		oldString = echo;
-		terminal->Append(echo);
-		terminal->EnsureVisible(terminal->GetCount() - 1);
+		if (oldString.size() >= 1)
+		{
+			std::stringstream ss;
+			ss << "Echo from: " << client.GetConnectionInfo() << " : " << oldString;
+			terminal->Append(ss.str().c_str());
+			terminal->EnsureVisible(terminal->GetCount() - 1);
+		}
 	}
 
 	//resend string data every 200th timer event to save network traffic
@@ -196,6 +222,8 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		// send the string
 		std::string stlstring = std::string(txt0->GetValue().mb_str());
 		limitStringSize(stlstring, 500);
+
+		client.SendMsg(controlMessage + stlstring);
 		//sender->UDP_Send(controlMessage + stlstring);
 	}
 	//update looper
