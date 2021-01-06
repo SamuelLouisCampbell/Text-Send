@@ -87,6 +87,8 @@ protected:
 	wxTimer timer;
 	int loopCounter = 0;
 
+	int maxStrSize = 500;
+
 	//buttons and boxes etc
 	wxButton* btn0 = nullptr;
 	wxButton*btn1 = nullptr;

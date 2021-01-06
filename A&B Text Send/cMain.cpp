@@ -108,6 +108,7 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[evt.GetId() + 1]; //color
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
+	limitStringSize(stlstring, maxStrSize);
 	client.SendMsg(controlMessage + stlstring);
 	
 	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
@@ -122,7 +123,7 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[2]; //small
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-
+	limitStringSize(stlstring, maxStrSize);
 	client.SendMsg(controlMessage + stlstring);
 
 	font0->SetPointSize(36);
@@ -137,7 +138,7 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	controlMessage = ListsAndColors::Commands[1]; //large
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	
+	limitStringSize(stlstring, maxStrSize);
 	client.SendMsg(controlMessage + stlstring);
 
 	font0->SetPointSize(128);
@@ -159,6 +160,7 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
+	limitStringSize(stlstring, maxStrSize);
 	client.SendMsg(controlMessage + stlstring);
 
 	evt.Skip();
@@ -229,14 +231,13 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		{
 			controlMessage = ListsAndColors::Commands[0]; //null
 			assert(controlMessage.size() == 8u);
-			//sender->UDP_Send(controlMessage);
+
 		}
 		// send the string
 		std::string stlstring = std::string(txt0->GetValue().mb_str());
-		limitStringSize(stlstring, 500);
-
+		limitStringSize(stlstring, maxStrSize);
 		client.SendMsg(controlMessage + stlstring);
-		//sender->UDP_Send(controlMessage + stlstring);
+		
 	}
 	//update looper
 	loopCounter++;
