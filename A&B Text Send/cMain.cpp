@@ -36,7 +36,7 @@ cMain::cMain()
 	terminal = new wxListBox(this, wxID_ANY);
 	terminal->SetFont(*terminalFont);
 	terminal->SetBackgroundColour(ListsAndColors::ButtonCols[9]);
-	terminal->SetForegroundColour(ListsAndColors::ButtonCols[1]);
+	terminal->SetForegroundColour(ListsAndColors::ButtonCols[10]);
 
 	//Create Color Buttons
 	

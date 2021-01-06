@@ -1,5 +1,5 @@
 #pragma once
-#include "UDPClient.h"
+#include <NetCommonInclude.h>
 #include <fstream>
 
 class LoadRMData

@@ -25,13 +25,21 @@ public:
 		msg << now;
 		m_connection->Send(msg);
 	}
-	void SendMsg(const std::string& messsage)
-	{
-		std::vector<unsigned char> buff;
+	void SendMsg(const std::string& messsage)	{
 		netcommon::message<CustomMsgType> msg;
-		for (auto& c : messsage)
+
+		bool finished = false;
+		for (size_t i = 0; i < messsage.size(); i++)
 		{
-			msg << c;
+			if(!finished)
+			{
+				msg << messsage[i];
+				if (messsage[i] == '\0')
+				{
+					finished = true;
+					break;
+				}
+			}
 		}
 		msg.header.id = CustomMsgType::MessageServer;
 		
