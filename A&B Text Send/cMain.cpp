@@ -159,8 +159,6 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
-	//listener->Recieve();
-
 	client.SendMsg(controlMessage + stlstring);
 
 	evt.Skip();
@@ -168,6 +166,11 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 
 void cMain::OnTimer(wxTimerEvent& evt)
 {
+	//dont let terminal get too large
+	if (terminal->GetCount() > 500)
+	{
+		terminal->Clear();
+	}
 	//listen for echos every event
 	wxString echo;
 	if (client.IsConnected())
@@ -184,6 +187,15 @@ void cMain::OnTimer(wxTimerEvent& evt)
 				{
 					echo += c;
 				}
+				break;
+			}
+			case CustomMsgType::HealthCheckServer:
+			{
+				client.EchoHealthCheck();
+				std::stringstream ss;
+				ss << "Server Health Check Recieved";
+				terminal->Append(ss.str().c_str());
+				terminal->EnsureVisible(terminal->GetCount() - 1);
 				break;
 			}
 			default:

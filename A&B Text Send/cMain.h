@@ -11,6 +11,7 @@ enum class CustomMsgType : uint32_t
 	ServerPing,
 	MessageServer,
 	EchoMessage,
+	HealthCheckServer,
 };
 
 class CustomClient : public netcommon::ClientInterface<CustomMsgType>
@@ -42,7 +43,12 @@ public:
 			}
 		}
 		msg.header.id = CustomMsgType::MessageServer;
-		
+		m_connection->Send(msg);
+	}
+	void EchoHealthCheck()
+	{
+		netcommon::message<CustomMsgType> msg;
+		msg.header.id = CustomMsgType::EchoMessage;
 		m_connection->Send(msg);
 	}
 
