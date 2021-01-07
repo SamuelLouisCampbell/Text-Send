@@ -18,13 +18,14 @@ class CustomClient : public netcommon::ClientInterface<CustomMsgType>
 {
 public:
 	void PingServer()
-	{
+	{	
 		netcommon::message<CustomMsgType> msg;
 		msg.header.id = CustomMsgType::ServerPing;
 		//caution
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 		msg << now;
 		m_connection->Send(msg);
+		
 	}
 	void SendMsg(const std::string& messsage)	{
 		netcommon::message<CustomMsgType> msg;
@@ -32,7 +33,7 @@ public:
 		bool finished = false;
 		for (size_t i = 0; i < messsage.size(); i++)
 		{
-			if(!finished)
+			if (!finished)
 			{
 				msg << messsage[i];
 				if (messsage[i] == '\0')
@@ -53,6 +54,7 @@ public:
 	}
 
 private:
+	
 };
 
 enum tag
@@ -86,6 +88,7 @@ protected:
 	//timer things
 	wxTimer timer;
 	int loopCounter = 0;
+	std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
 
 	int maxStrSize = 500;
 
@@ -103,12 +106,18 @@ protected:
 
 	//network things
 	LoadRMData rmd;
-	CustomClient client;
+	std::unique_ptr<CustomClient> client;
 
 	//strings for echo
 	wxString oldString = "";
 
 private:
+	int healthCheck = 0;
+	bool NetworkHealthChecker() const;
+	void UpdateHealthChecker(bool updateBool);
+	void SendProtectedMessage(std::string message);
+
+
 	wxDECLARE_EVENT_TABLE();
 };
 

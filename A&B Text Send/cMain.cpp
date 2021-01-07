@@ -1,6 +1,7 @@
 #include "cMain.h"
 #include <cassert>
 #include "ListsAndColors.h"
+#include <iomanip>
 
 
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
@@ -75,24 +76,23 @@ cMain::cMain()
 	timer.Start(5);
 
 	//setup network with error checking
+	client = std::make_unique<CustomClient>();
 	if (rmd.FileReadOK() && rmd.CheckRMIPGood() && rmd.CheckRMPortsGood())
 	{
-		client.Connect(rmd.GetIP(), rmd.GetServerPort());
+		client->Connect(rmd.GetIP(), rmd.GetServerPort());
 		
 		std::stringstream ss; 
-		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Listening on port: " << rmd.GetServerPort() << " ";
-		ss << "Local Information: " << client.GetConnectionInfo();
+		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
+		ss << "Local Information: " << client->GetConnectionInfo();
 		terminal->Append(ss.str());
 	}
 	else
 	{	
 		rmd.SetIPToDefault();
 		rmd.SetPortToDefault();
-		//sender = std::make_unique<UDPClient>(rmd.GetClientPort(), rmd.GetIP());
-		//listener = std::make_unique<UDPServer>(rmd.GetServerPort());
 		std::stringstream ss;
 		ss << "Problem with ports or IP Addr. Reset to defaults. Sending to: "
-			<< rmd.GetIP() << " Listening on port: " << rmd.GetServerPort();
+			<< rmd.GetIP() << " Port: " << rmd.GetServerPort();
 		terminal->Append(ss.str());
 	}
 	
@@ -109,7 +109,7 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	client.SendMsg(controlMessage + stlstring);
+	SendProtectedMessage(controlMessage + stlstring);
 	
 	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
 	txt0->SetFont(*font0);
@@ -124,7 +124,7 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	client.SendMsg(controlMessage + stlstring);
+	SendProtectedMessage(controlMessage + stlstring);
 
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
@@ -139,7 +139,7 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	client.SendMsg(controlMessage + stlstring);
+	SendProtectedMessage(controlMessage + stlstring);
 
 	font0->SetPointSize(128);
 	txt0->SetFont(*font0);
@@ -156,12 +156,12 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 		controlMessage = ListsAndColors::Commands[0]; //null
 		assert(controlMessage.size() == 8u);
 		
-		client.SendMsg(controlMessage);
+		SendProtectedMessage(controlMessage);
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	client.SendMsg(controlMessage + stlstring);
+	SendProtectedMessage(controlMessage + stlstring);
 
 	evt.Skip();
 }
@@ -173,13 +173,27 @@ void cMain::OnTimer(wxTimerEvent& evt)
 	{
 		terminal->Clear();
 	}
+
+	//delete client if network times out
+	if (!NetworkHealthChecker())
+	{
+		if (client != nullptr)
+		{
+			client->Disconnect();
+			client.release();
+			client = nullptr;
+		}
+		healthCheck = 0;
+	}
+
+
 	//listen for echos every event
 	wxString echo;
-	if (client.IsConnected())
+	if (client != nullptr && client->IsConnected())
 	{
-		if (!client.IncomingMessages().empty())
+		if (!client->IncomingMessages().empty())
 		{
-			auto msg = client.IncomingMessages().pop_front().msg;
+			auto msg = client->IncomingMessages().pop_front().msg;
 
 			switch (msg.header.id)
 			{
@@ -193,36 +207,75 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			}
 			case CustomMsgType::HealthCheckServer:
 			{
-				client.EchoHealthCheck();
+				//reset health check val;
+				UpdateHealthChecker(true);
+				client->EchoHealthCheck();
 				std::stringstream ss;
-				ss << "Server Health Check Recieved";
+				/*ss << "Server Health Check Recieved";
+				terminal->Append(ss.str().c_str());
+				terminal->EnsureVisible(terminal->GetCount() - 1);*/
+				break;
+			}
+			case CustomMsgType::ServerPing:
+			{
+				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+				std::chrono::system_clock::time_point then;
+				msg >> then;
+				std::stringstream ss;
+				ss << "Ping Recieved: " << std::chrono::duration(now - then).count() << "ms.";
 				terminal->Append(ss.str().c_str());
 				terminal->EnsureVisible(terminal->GetCount() - 1);
 				break;
 			}
 			default:
-				client.IncomingMessages().eraseQ();
+				client->IncomingMessages().eraseQ();
 				break;
 			}
 		}
 	}
 
 	//check to see if message is unique/new.
-	if (echo != oldString)
+	if (client != nullptr)
 	{
-		oldString = echo;
-		if (oldString.size() >= 1)
+		if (echo != oldString)
 		{
-			std::stringstream ss;
-			ss << "Echo from: " << client.GetConnectionInfo() << " : " << oldString;
-			terminal->Append(ss.str().c_str());
-			terminal->EnsureVisible(terminal->GetCount() - 1);
+			oldString = echo;
+			if (oldString.size() >= 1)
+			{
+				std::stringstream ss;
+				ss << "Echo from: " << client->GetConnectionInfo() << " : " << oldString;
+				terminal->Append(ss.str().c_str());
+				terminal->EnsureVisible(terminal->GetCount() - 1);
+			}
 		}
 	}
-
-	//resend string data every 200th timer event to save network traffic
-	if (loopCounter >= 200)
+	
+	//resend string data every 60th timer event to save network traffic
+	if (loopCounter >= 60)
 	{
+		//try and timeout healthcheck 
+		UpdateHealthChecker(false);
+		std::stringstream ss;
+		if (client == nullptr || !client->IsConnected())
+		{
+			ss << "Network Timeout = " << healthCheck - 1;
+			terminal->Append(ss.str());
+			terminal->EnsureVisible(terminal->GetCount() - 1);
+		}
+
+		//if disconnected try to reconnect
+		if (client == nullptr)
+		{
+			client = std::make_unique<CustomClient>();
+			client->Connect(rmd.GetIP(), rmd.GetServerPort());
+
+			std::stringstream ss;
+			ss << "Network down attempting reconnect tp: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
+			ss << "Local Information: " << client->GetConnectionInfo();
+			terminal->Append(ss.str());
+			terminal->EnsureVisible(terminal->GetCount() - 1);
+		}
+
 		loopCounter = 0;
 		std::string controlMessage = ListsAndColors::Commands[0];
 		//Timer event sends packets regardless of keystrokes.
@@ -236,9 +289,41 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		// send the string
 		std::string stlstring = std::string(txt0->GetValue().mb_str());
 		limitStringSize(stlstring, maxStrSize);
-		client.SendMsg(controlMessage + stlstring);
+		SendProtectedMessage(controlMessage + stlstring);
 		
 	}
 	//update looper
 	loopCounter++;
+
+}
+
+bool cMain::NetworkHealthChecker() const
+{
+	if (healthCheck >= 5)
+	{
+		return false;
+	}
+	return true;
+}
+
+void cMain::UpdateHealthChecker(bool updateBool)
+{
+	if (updateBool == true)
+	{
+		//reset if any true condition
+		healthCheck = 0;
+	}
+	else
+	{
+		//add one this time.
+		healthCheck++;
+	}
+}
+
+void cMain::SendProtectedMessage(std::string message)
+{
+	if (client != nullptr)
+	{
+		client->SendMsg(message);
+	}
 }
