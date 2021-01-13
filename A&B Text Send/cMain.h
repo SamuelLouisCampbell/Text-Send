@@ -1,7 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "LoadRMData.h"
 #include "NetClient.h"
+#include "LoadRMData.h"
 #include <wx/wx.h>
 
 enum class CustomMsgType : uint32_t
