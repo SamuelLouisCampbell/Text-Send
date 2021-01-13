@@ -30,17 +30,19 @@ cMain::cMain()
 	btn0->SetFont(*buttonFont);
 	btn1 = new wxButton(this, tag::button_1, "Large Text");
 	btn1->SetFont(*buttonFont);
-	txt0 = new wxTextCtrl(this, tag::text_0, "", wxPoint(0, 0), wxSize(1280, 300), wxTE_MULTILINE | wxTE_CENTER | wxTE_BESTWRAP);
+	txt0 = new wxTextCtrl(this, tag::text_0, "", wxPoint(0, 0), wxSize(1280, 300), wxTE_NO_VSCROLL | wxNO_BORDER | wxTE_MULTILINE | wxTE_CENTER | wxTE_BESTWRAP);
+
 
 	//terminal setup
 	terminalFont = new wxFont(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
 	terminal = new wxListBox(this, wxID_ANY);
+	terminal->SetWindowStyle(wxNO_BORDER);
+	terminal->SetExtraStyle (wxTE_NO_VSCROLL | wxNO_BORDER);
 	terminal->SetFont(*terminalFont);
 	terminal->SetBackgroundColour(ListsAndColors::ButtonCols[9]);
 	terminal->SetForegroundColour(ListsAndColors::ButtonCols[10]);
 
-	//Create Color Buttons
-	
+	//Create Color Buttons.	
 	wxButton* btnCol[8];
 	sizer1 = new wxGridSizer(8, 0,0);
 	for (int i = 0; i < 8; i++)
@@ -64,7 +66,7 @@ cMain::cMain()
 	sizer0->SetSizeHints(this);
 	SetSizer(sizer0);
 	
-	font0 = new wxFont(36, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Arial");
+	font0 = new wxFont(36, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "ABOVEANDBYOND2013");
 	this->SetBackgroundColour({ 12,12,12 });
 	txt0->SetFont(*font0);
 	txt0->SetForegroundColour({ 255,255,255 });

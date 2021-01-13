@@ -16,6 +16,7 @@ bool cApp::OnInit()
     fram0 = new cMain();
     
     fram0->SetIcons(wxICON(aaaaIDI_ICON1));
+    fram0->SetBackgroundColour({ 0,12,55 });
     fram0->Show();
     return true;
 }
