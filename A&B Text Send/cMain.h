@@ -116,7 +116,7 @@ private:
 	bool NetworkHealthChecker() const;
 	void UpdateHealthChecker(bool updateBool);
 	void SendProtectedMessage(std::string message);
-
+	wxTextAttr textDesc;
 
 	wxDECLARE_EVENT_TABLE();
 };

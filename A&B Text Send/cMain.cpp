@@ -30,7 +30,7 @@ cMain::cMain()
 	btn0->SetFont(*buttonFont);
 	btn1 = new wxButton(this, tag::button_1, "Large Text");
 	btn1->SetFont(*buttonFont);
-	txt0 = new wxTextCtrl(this, tag::text_0, "", wxPoint(0, 0), wxSize(1280, 300), wxTE_NO_VSCROLL | wxNO_BORDER | wxTE_MULTILINE | wxTE_CENTER | wxTE_BESTWRAP);
+	txt0 = new wxTextCtrl(this, tag::text_0, "", wxPoint(0, 0), wxSize(1280, 300), wxTE_RICH | wxTE_NO_VSCROLL | wxNO_BORDER | wxTE_MULTILINE | wxTE_CENTER | wxTE_BESTWRAP);
 
 
 	//terminal setup
@@ -66,11 +66,16 @@ cMain::cMain()
 	sizer0->SetSizeHints(this);
 	SetSizer(sizer0);
 	
+
+	textDesc.SetBackgroundColour(wxColor{ 0,0,0 });
+	textDesc.SetTextColour(wxColor(255, 0, 0));
+
 	font0 = new wxFont(36, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "ABOVEANDBYOND2013");
 	this->SetBackgroundColour({ 12,12,12 });
 	txt0->SetFont(*font0);
-	txt0->SetForegroundColour({ 255,255,255 });
+	txt0->SetDefaultStyle(textDesc);
 	txt0->SetBackgroundColour({ 0,0,0 });
+	txt0->SetStyle(0, 0, ListsAndColors::ButtonCols[0]);
 	txt0->Show();
 	txt0->Bind(wxEVT_KEY_DOWN, &cMain::OnKeyDown, this);
 	txt0->Bind(wxEVT_KEY_UP, &cMain::OnKeyDown, this);
@@ -112,8 +117,8 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
 	SendProtectedMessage(controlMessage + stlstring);
-	
-	txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
+	txt0->SetStyle(0, txt0->GetValue().size(), ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
+	//txt0->SetForegroundColour(ListsAndColors::ButtonCols[(evt.GetId() - 2) % 8]);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
 	evt.Skip();
@@ -127,7 +132,6 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
 	SendProtectedMessage(controlMessage + stlstring);
-
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
