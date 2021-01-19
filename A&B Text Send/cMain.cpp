@@ -133,6 +133,7 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
+	txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
 	evt.Skip();
 }
 
@@ -147,12 +148,12 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	font0->SetPointSize(128);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
+	txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
 	evt.Skip();
 }
 
 void cMain::OnKeyDown(wxKeyEvent& evt)
 {
-	txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
 	std::string controlMessage = cc.GetCommandd(0);
 	//Send special null string to renderer.
 	if (txt0->GetValue().size() == 0)
@@ -166,12 +167,18 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
 	SendProtectedMessage(controlMessage + stlstring);
-
 	evt.Skip();
 }
 
 void cMain::OnTimer(wxTimerEvent& evt)
 {
+	//Refresh the colour if size is Zero.
+
+	if (txt0->GetValue().size() == 0)
+	{
+		txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
+	}
+
 	//dont let terminal get too large
 	if (terminal->GetCount() > 500)
 	{
