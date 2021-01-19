@@ -189,7 +189,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			client.release();
 			client = nullptr;
 		}
-		healthCheck = 0;
+		UpdateHealthChecker(true);
 	}
 
 
@@ -216,10 +216,6 @@ void cMain::OnTimer(wxTimerEvent& evt)
 				//reset health check val;
 				UpdateHealthChecker(true);
 				client->EchoHealthCheck();
-				std::stringstream ss;
-				/*ss << "Server Health Check Recieved";
-				terminal->Append(ss.str().c_str());
-				terminal->EnsureVisible(terminal->GetCount() - 1);*/
 				break;
 			}
 			case CustomMsgType::ServerPing:
@@ -270,19 +266,18 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		}
 
 		//if disconnected try to reconnect
-		if (client == nullptr)
+		if (client == nullptr && !NetworkHealthChecker())
 		{
 			client = std::make_unique<CustomClient>();
 			client->Connect(rmd.GetIP(), rmd.GetServerPort());
-
+			UpdateHealthChecker(true);
 			std::stringstream ss;
-			ss << "Network down attempting reconnect tp: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
+			ss << "Network down attempting reconnect to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
 			ss << "Local Information: " << client->GetConnectionInfo();
 			terminal->Append(ss.str());
 			terminal->EnsureVisible(terminal->GetCount() - 1);
 		}
 
-		loopCounter = 0;
 		std::string controlMessage = ListsAndColors::Commands[0];
 		//Timer event sends packets regardless of keystrokes.
 		//Send null string to renderer.
@@ -297,6 +292,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		limitStringSize(stlstring, maxStrSize);
 		SendProtectedMessage(controlMessage + stlstring);
 		
+		loopCounter = 0;
 	}
 	//update looper
 	loopCounter++;

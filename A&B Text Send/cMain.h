@@ -3,6 +3,7 @@
 #include "NetClient.h"
 #include "LoadRMData.h"
 #include <wx/wx.h>
+#include <wx/listctrl.h>
 
 enum class CustomMsgType : uint32_t
 {

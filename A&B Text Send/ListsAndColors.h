@@ -23,12 +23,12 @@ namespace ListsAndColors
 		"NULL....", //0
 		"LARGE...", //1
 		"SMALL...", //2
+		"WHITE...", //9
 		"RED.....", //3
 		"GREEN...", //4
 		"BLUE....", //5
 		"CYAN....", //6
 		"MAGENTA.", //7
-		"WHITE...", //9
 		"YELLOW..", //8
 		"ORANGE..", //10
 	};
