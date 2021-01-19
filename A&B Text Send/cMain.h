@@ -4,6 +4,7 @@
 #include "LoadRMData.h"
 #include <wx/wx.h>
 #include <wx/listctrl.h>
+#include "ListsAndColors.h"
 
 enum class CustomMsgType : uint32_t
 {
@@ -56,6 +57,21 @@ public:
 
 private:
 	
+};
+
+enum Colors
+{
+	white,
+	red,
+	green,
+	blue,
+	cyan,
+	magenta,
+	yellow,
+	orange,
+	grey,
+	black,
+	purple
 };
 
 enum tag
@@ -118,6 +134,7 @@ private:
 	void UpdateHealthChecker(bool updateBool);
 	void SendProtectedMessage(std::string message);
 	wxTextAttr textDesc;
+	ColorManager cc;
 
 	wxDECLARE_EVENT_TABLE();
 };

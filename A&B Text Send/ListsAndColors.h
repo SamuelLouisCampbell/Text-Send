@@ -1,23 +1,30 @@
 #pragma once
-#include <wx/wx.h>
+#include <wx/colour.h>
 
-namespace ListsAndColors
+class ColorManager
 {
+public:
+	void SetColor(const int col_in);
+	const char* GetButtonLabel(const int index);
+	const char* GetCommandd(const int index);
+	wxColor GetAColor(const int index) const;
+	wxColor GetCurrColor() const;
+private:
+	wxColor currColor = ButtonCols[0];
 	wxColor ButtonCols[11] =
 	{
-		{255,255,255,},	
-		{255,0,0,},		
-		{0,255,0,},		
-		{0,0,255},		
-		{0,255,255,},	
-		{255,0,255,},	
-		{255,255,0,},	
-		{255,128,0,},	
-		{64,64,64},		
-		{0,0,0,},		
+		{255,255,255,},
+		{255,0,0,},
+		{0,255,0,},
+		{0,0,255},
+		{0,255,255,},
+		{255,0,255,},
+		{255,255,0,},
+		{255,128,0,},
+		{64,64,64},
+		{0,0,0,},
 		{128,25,255}	//10 Terminal Font
 	};
-
 	const char* Commands[11] =
 	{
 		"NULL....", //0
@@ -43,4 +50,5 @@ namespace ListsAndColors
 		"Yellow",
 		"Orange"
 	};
-}
+};
+
