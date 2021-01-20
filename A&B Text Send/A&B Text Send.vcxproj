@@ -160,11 +160,13 @@
     <ClInclude Include="ListsAndColors.h" />
     <ClInclude Include="LoadRMData.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Terminal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="ListsAndColors.cpp" />
+    <ClCompile Include="Terminal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="A&amp;B Text Send.rc" />

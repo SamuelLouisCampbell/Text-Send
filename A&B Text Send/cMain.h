@@ -5,6 +5,7 @@
 #include <wx/wx.h>
 #include <wx/listctrl.h>
 #include "ListsAndColors.h"
+#include "Terminal.h"
 
 enum class CustomMsgType : uint32_t
 {
@@ -115,11 +116,15 @@ protected:
 	wxFont* font0 = nullptr;
 	wxFont* buttonFont = nullptr;
 	wxFont* terminalFont = nullptr;
+	wxTextCtrl* terminalWindow = nullptr;
 	wxTextCtrl* txt0 = nullptr;
-	wxListCtrl* terminal = nullptr;
 	wxBoxSizer* sizer0 = nullptr;
 	wxGridSizer* sizer1 = nullptr;
 	wxBoxSizer* sizer2 = nullptr;
+
+	//terminal
+	TerminalData td;
+	size_t oldNumMessages = 0;
 
 	//network things
 	LoadRMData rmd;
@@ -129,11 +134,6 @@ protected:
 	wxString oldString = "";
 
 private:
-	std::vector<wxListItem*> terminalList;
-	size_t oldVecSize = terminalList.size();
-	void AddStringToTerminal(const wxColor color, const wxString str);
-
-
 	int healthCheck = 0;
 	bool NetworkHealthChecker() const;
 	void UpdateHealthChecker(bool updateBool);
