@@ -35,9 +35,15 @@ cMain::cMain()
 
 	//terminal setup
 	terminalFont = new wxFont(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-	terminal = new wxListBox(this, wxID_ANY);
-	terminal->SetWindowStyle(wxNO_BORDER);
-	terminal->SetExtraStyle (wxTE_NO_VSCROLL | wxNO_BORDER);
+	terminal = new wxListCtrl(this, wxID_ANY);
+	//terminal->SetWindowStyle(wxNO_BORDER);
+	terminal->SetWindowStyle(wxLC_LIST | wxNO_BORDER);
+	wxListItem itemCol;
+	itemCol.SetText(wxT("TERMINAL"));
+	itemCol.SetImage(-1);
+	terminal->InsertColumn(0, itemCol);
+	
+	//terminal->SetExtraStyle (wxTE_NO_VSCROLL | wxNO_BORDER);
 	terminal->SetFont(*terminalFont);
 	terminal->SetBackgroundColour(cc.GetAColor(Colors::black));
 	terminal->SetForegroundColour(cc.GetAColor(Colors::purple));
@@ -89,7 +95,7 @@ cMain::cMain()
 		std::stringstream ss; 
 		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
 		ss << "Local Information: " << client->GetConnectionInfo();
-		terminal->Append(ss.str());
+		//terminal->Append(ss.str());
 	}
 	else
 	{	
@@ -98,13 +104,16 @@ cMain::cMain()
 		std::stringstream ss;
 		ss << "Problem with ports or IP Addr. Reset to defaults. Sending to: "
 			<< rmd.GetIP() << " Port: " << rmd.GetServerPort();
-		terminal->Append(ss.str());
+		//terminal->Append(ss.str());
+		AddStringToTerminal(cc.GetAColor(Colors::blue), ss.str());
 	}
 	
 }
 
 cMain::~cMain()
 {
+	client->Disconnect();
+	client->IncomingMessages().eraseQ();
 }
 
 void cMain::OnButtonClickColor(wxCommandEvent& evt)
@@ -179,10 +188,21 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
 	}
 
-	//dont let terminal get too large
-	if (terminal->GetCount() > 500)
+	//Terminal mamagement
+	if (terminalList.size() != oldVecSize)
 	{
-		terminal->Clear();
+		terminal->ClearAll();
+		for (auto& list : terminalList)
+		{
+			terminal->InsertItem(*list);
+		}
+		oldVecSize = terminalList.size();
+	}
+	//dont let terminal get too large
+	if (terminalList.size() >= 255)
+	{
+		terminalList.clear();
+		terminal->ClearAll();
 	}
 
 	//delete client if network times out
@@ -230,8 +250,9 @@ void cMain::OnTimer(wxTimerEvent& evt)
 				msg >> then;
 				std::stringstream ss;
 				ss << "Ping Recieved: " << std::chrono::duration(now - then).count() << "ms.";
-				terminal->Append(ss.str().c_str());
-				terminal->EnsureVisible(terminal->GetCount() - 1);
+				//terminal->Append(ss.str().c_str());
+				AddStringToTerminal(cc.GetAColor(Colors::blue), ss.str());
+				//terminal->EnsureVisible(terminal->GetCount() - 1);
 				break;
 			}
 			default:
@@ -251,8 +272,9 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			{
 				std::stringstream ss;
 				ss << "Echo returned to: " << client->GetConnectionInfo() << " : " << oldString;
-				terminal->Append(ss.str().c_str());
-				terminal->EnsureVisible(terminal->GetCount() - 1);
+				//terminal->Append(ss.str().c_str());
+				//terminal->EnsureVisible(terminal->GetCount() - 1);
+				AddStringToTerminal(cc.GetAColor(Colors::blue), ss.str());
 			}
 		}
 	}
@@ -266,8 +288,8 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		if (client == nullptr || !client->IsConnected())
 		{
 			ss << "Network Timeout = " << healthCheck - 1;
-			terminal->Append(ss.str());
-			terminal->EnsureVisible(terminal->GetCount() - 1);
+			//terminal->Append(ss.str());
+			//terminal->EnsureVisible(terminal->GetCount() - 1);
 		}
 
 		//if disconnected try to reconnect
@@ -279,8 +301,8 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			std::stringstream ss;
 			ss << "Network down attempting reconnect to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
 			ss << "Local Information: " << client->GetConnectionInfo();
-			terminal->Append(ss.str());
-			terminal->EnsureVisible(terminal->GetCount() - 1);
+			//terminal->Append(ss.str());
+			//terminal->EnsureVisible(terminal->GetCount() - 1);
 		}
 
 		std::string controlMessage = cc.GetCommandd(0);
@@ -302,6 +324,15 @@ void cMain::OnTimer(wxTimerEvent& evt)
 	//update looper
 	loopCounter++;
 
+}
+
+void cMain::AddStringToTerminal(const wxColor color, const wxString str)
+{
+	wxListItem* tempItem = new wxListItem;
+	tempItem->SetText(str);
+	tempItem->SetTextColour(color);
+	tempItem->SetId(terminalList.size());
+	terminalList.push_back(std::move(tempItem));
 }
 
 bool cMain::NetworkHealthChecker() const

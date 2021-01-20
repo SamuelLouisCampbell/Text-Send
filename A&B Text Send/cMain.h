@@ -116,7 +116,7 @@ protected:
 	wxFont* buttonFont = nullptr;
 	wxFont* terminalFont = nullptr;
 	wxTextCtrl* txt0 = nullptr;
-	wxListBox* terminal = nullptr;
+	wxListCtrl* terminal = nullptr;
 	wxBoxSizer* sizer0 = nullptr;
 	wxGridSizer* sizer1 = nullptr;
 	wxBoxSizer* sizer2 = nullptr;
@@ -129,6 +129,11 @@ protected:
 	wxString oldString = "";
 
 private:
+	std::vector<wxListItem*> terminalList;
+	size_t oldVecSize = terminalList.size();
+	void AddStringToTerminal(const wxColor color, const wxString str);
+
+
 	int healthCheck = 0;
 	bool NetworkHealthChecker() const;
 	void UpdateHealthChecker(bool updateBool);
