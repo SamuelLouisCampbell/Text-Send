@@ -11,7 +11,7 @@ public:
 	wxColor GetCurrColor() const;
 private:
 	wxColor currColor = ButtonCols[0];
-	wxColor ButtonCols[11] =
+	wxColor ButtonCols[13] =
 	{
 		{255,255,255,},
 		{255,0,0,},
@@ -23,7 +23,9 @@ private:
 		{255,128,0,},
 		{64,64,64},
 		{0,0,0,},
-		{128,25,255}	//10 Terminal Font
+		{64,0,255}, //10 Terminal Font
+		{128,0,0}, //11 Dark Red
+		{0,128,64}, //12 Dark Green
 	};
 	const char* Commands[11] =
 	{

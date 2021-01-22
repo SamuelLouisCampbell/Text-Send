@@ -72,7 +72,9 @@ enum Colors
 	orange,
 	grey,
 	black,
-	purple
+	purple,
+	darkRed,
+	darkGreen
 };
 
 enum tag
@@ -125,6 +127,7 @@ protected:
 	//terminal
 	TerminalData td;
 	size_t oldNumMessages = 0;
+	size_t maxNumMessages = 512;
 
 	//network things
 	LoadRMData rmd;

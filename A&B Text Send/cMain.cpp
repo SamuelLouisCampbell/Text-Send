@@ -35,7 +35,7 @@ cMain::cMain()
 
 	//terminal setup
 	terminalFont = new wxFont(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
-	terminalWindow = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_NOHIDESEL | wxTE_RICH | wxNO_BORDER | wxTE_MULTILINE | wxTE_LEFT);
+	terminalWindow = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_READONLY | wxTE_NOHIDESEL | wxTE_RICH | wxNO_BORDER | wxTE_MULTILINE | wxTE_LEFT);
 	terminalWindow->SetBackgroundColour(Colors::black);
 	
 
@@ -64,9 +64,9 @@ cMain::cMain()
 	sizer0->Add(sizer1, 1, wxEXPAND | wxALL, 0);
 	sizer0->SetSizeHints(this);
 	SetSizer(sizer0);
-	
+
 	font0 = new wxFont(36, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "ABOVEANDBYOND2013");
-	this->SetBackgroundColour({ 12,12,12 });
+
 	txt0->SetFont(*font0);
 	txt0->SetBackgroundColour({ 0,0,0 });
 	cc.SetColor(Colors::white);
@@ -75,8 +75,7 @@ cMain::cMain()
 	txt0->Bind(wxEVT_KEY_DOWN, &cMain::OnKeyDown, this);
 	txt0->Bind(wxEVT_KEY_UP, &cMain::OnKeyDown, this);
 
-	
-
+	//timer things
 	timer.Start(5);
 
 	//setup network with error checking
@@ -88,8 +87,7 @@ cMain::cMain()
 		std::stringstream ss; 
 		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
 		ss << "Local Information: " << client->GetConnectionInfo();
-		//terminal->Append(ss.str());
-		td.AppendMessage(ss.str(), cc.GetAColor(Colors::green));
+		td.AppendMessage(ss.str(), cc.GetAColor(Colors::purple));
 	}
 	else
 	{	
@@ -98,9 +96,7 @@ cMain::cMain()
 		std::stringstream ss;
 		ss << "Problem with ports or IP Addr. Reset to defaults. Sending to: "
 			<< rmd.GetIP() << " Port: " << rmd.GetServerPort();
-		td.AppendMessage(ss.str(), cc.GetAColor(Colors::red));
-		//terminal->Append(ss.str());
-
+		td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkRed));
 	}
 	
 }
@@ -187,7 +183,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 	{
 		terminalWindow->SetStyle(td.GetLastMessage().messageStart, td.GetLastMessage().messageEnd, td.GetLastMessage().colour);
 		*terminalWindow << td.GetLastMessage().message << "\n";
-		if (td.GetNoMessages() > 100)
+		if (td.GetNoMessages() >= maxNumMessages)
 		{
 			terminalWindow->Clear();
 			td.ClearMessages();
@@ -204,7 +200,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			client.release();
 			client = nullptr;
 		}
-		UpdateHealthChecker(true);
+		//UpdateHealthChecker(true);
 	}
 
 
@@ -260,7 +256,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			{
 				std::stringstream ss;
 				ss << "Echo returned to: " << client->GetConnectionInfo() << " : " << oldString;
-				td.AppendMessage(ss.str(), cc.GetAColor(Colors::green));
+				td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkGreen));
 			}
 		}
 	}
@@ -274,7 +270,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		if (client == nullptr || !client->IsConnected())
 		{
 			ss << "Network Timeout = " << healthCheck - 1;
-			td.AppendMessage(ss.str(), cc.GetAColor(Colors::red));
+			td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkRed));
 		}
 
 		//if disconnected try to reconnect
@@ -286,7 +282,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 			std::stringstream ss;
 			ss << "Network down attempting reconnect to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
 			ss << "Local Information: " << client->GetConnectionInfo();
-			td.AppendMessage(ss.str(), cc.GetAColor(Colors::blue));
+			td.AppendMessage(ss.str(), cc.GetAColor(Colors::purple));
 		}
 
 		std::string controlMessage = cc.GetCommandd(0);
