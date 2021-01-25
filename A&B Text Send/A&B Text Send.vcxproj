@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h" />
+    <ClInclude Include="ClientTCP.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="ListsAndColors.h" />
     <ClInclude Include="LoadRMData.h" />

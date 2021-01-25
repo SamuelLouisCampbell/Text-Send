@@ -19,7 +19,7 @@ cMain::cMain()
 	:
 	wxFrame(nullptr, wxID_ANY, "Text Input & Send", wxPoint(30, 30), wxSize(720, 1280)),
 	timer(this, tag::timer_0),
-	rmd("defaults.txt")
+	client(td)
 {
 	
 	//Button Font
@@ -46,10 +46,10 @@ cMain::cMain()
 	{
 		btnCol[i] = new wxButton(this, tag::button_red + i);
 		sizer1->Add(btnCol[i],1,wxEXPAND | wxALL);
-		//btnCol[i]->SetBackgroundColour(ListsAndColors::ButtonCols[i]);
+	
 		btnCol[i]->SetBackgroundColour(cc.GetAColor(i));
 		btnCol[i]->SetFont(*buttonFont);
-		//btnCol[i]->SetLabelText(ListsAndColors::ButtonLabels[i]);
+	
 		btnCol[i]->SetLabelText(cc.GetButtonLabel(i));
 		btnCol[i]->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cMain::OnButtonClickColor, this);
 	}
@@ -78,32 +78,14 @@ cMain::cMain()
 	//timer things
 	timer.Start(5);
 
-	//setup network with error checking
-	client = std::make_unique<CustomClient>();
-	if (rmd.FileReadOK() && rmd.CheckRMIPGood() && rmd.CheckRMPortsGood())
-	{
-		client->Connect(rmd.GetIP(), rmd.GetServerPort());
-		
-		std::stringstream ss; 
-		ss << "Defaults file read OK. Sending to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
-		ss << "Local Information: " << client->GetConnectionInfo();
-		td.AppendMessage(ss.str(), cc.GetAColor(Colors::purple));
-	}
-	else
-	{	
-		rmd.SetIPToDefault();
-		rmd.SetPortToDefault();
-		std::stringstream ss;
-		ss << "Problem with ports or IP Addr. Reset to defaults. Sending to: "
-			<< rmd.GetIP() << " Port: " << rmd.GetServerPort();
-		td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkRed));
-	}
+	//Get Client Ready
+	client.StartClient();
 	
 }
 
 cMain::~cMain()
 {
-	client.release();
+
 }
 
 void cMain::OnButtonClickColor(wxCommandEvent& evt)
@@ -113,7 +95,7 @@ void cMain::OnButtonClickColor(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	SendProtectedMessage(controlMessage + stlstring);
+	client.SendMsg(controlMessage + stlstring);
 	cc.SetColor((evt.GetId() - 2) % 8);
 	txt0->SetStyle(0, txt0->GetValue().size(), cc.GetCurrColor());
 	txt0->SetFont(*font0);
@@ -128,7 +110,7 @@ void cMain::OnButtonClickSmallText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	SendProtectedMessage(controlMessage + stlstring);
+	client.SendMsg(controlMessage + stlstring);
 	font0->SetPointSize(36);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -143,7 +125,7 @@ void cMain::OnButtonClickLargeText(wxCommandEvent& evt)
 	assert(controlMessage.size() == 8u);
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	SendProtectedMessage(controlMessage + stlstring);
+	client.SendMsg(controlMessage + stlstring);
 	font0->SetPointSize(128);
 	txt0->SetFont(*font0);
 	txt0->SetFocus();
@@ -159,18 +141,20 @@ void cMain::OnKeyDown(wxKeyEvent& evt)
 	{
 		controlMessage = cc.GetCommandd(0); //null
 		assert(controlMessage.size() == 8u);
-		
-		SendProtectedMessage(controlMessage);
+		client.SendMsg(controlMessage);
 	}
 	// send the string
 	std::string stlstring = std::string(txt0->GetValue().mb_str());
 	limitStringSize(stlstring, maxStrSize);
-	SendProtectedMessage(controlMessage + stlstring);
+	client.SendMsg(controlMessage + stlstring);
 	evt.Skip();
 }
 
 void cMain::OnTimer(wxTimerEvent& evt)
 {
+	//Update Network 
+	client.Update();
+
 	//Refresh the colour if size is Zero.
 
 	if (txt0->GetValue().size() == 0)
@@ -191,100 +175,15 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		oldNumMessages = td.GetNoMessages();
 	}
 
-	//delete client if network times out
-	if (!NetworkHealthChecker())
-	{
-		if (client != nullptr)
-		{
-			client->Disconnect();
-			client.release();
-			client = nullptr;
-		}
-		//UpdateHealthChecker(true);
-	}
-
-
+	
 	//listen for echos every event
 	wxString echo;
-	if (client != nullptr && client->IsConnected())
-	{
-		if (!client->IncomingMessages().empty())
-		{
-			auto msg = client->IncomingMessages().pop_front().msg;
-
-			switch (msg.header.id)
-			{
-			case CustomMsgType::MessageServer:
-			{
-				for (auto& c : msg.body)
-				{
-					echo += c;
-				}
-				break;
-			}
-			case CustomMsgType::HealthCheckServer:
-			{
-				//reset health check val;
-				UpdateHealthChecker(true);
-				client->EchoHealthCheck();
-				break;
-			}
-			case CustomMsgType::ServerPing:
-			{
-				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-				std::chrono::system_clock::time_point then;
-				msg >> then;
-				std::stringstream ss;
-				ss << "Ping Recieved: " << std::chrono::duration(now - then).count() << "ms.";
-				td.AppendMessage(ss.str(), cc.GetAColor(Colors::orange));
-				break;
-			}
-			default:
-				client->IncomingMessages().eraseQ();
-				break;
-			}
-		}
-	}
-
-	//check to see if message is unique/new.
-	if (client != nullptr)
-	{
-		if (echo != oldString)
-		{
-			oldString = echo;
-			if (oldString.size() >= 1)
-			{
-				std::stringstream ss;
-				ss << "Echo returned to: " << client->GetConnectionInfo() << " : " << oldString;
-				td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkGreen));
-			}
-		}
-	}
 	
 	//resend string data every 60th timer event to save network traffic
 	if (loopCounter >= 60)
 	{
-		//try and timeout healthcheck 
-		UpdateHealthChecker(false);
-		std::stringstream ss;
-		if (client == nullptr || !client->IsConnected())
-		{
-			ss << "Network Timeout = " << healthCheck - 1;
-			td.AppendMessage(ss.str(), cc.GetAColor(Colors::darkRed));
-		}
-
-		//if disconnected try to reconnect
-		if (client == nullptr && !NetworkHealthChecker())
-		{
-			client = std::make_unique<CustomClient>();
-			client->Connect(rmd.GetIP(), rmd.GetServerPort());
-			UpdateHealthChecker(true);
-			std::stringstream ss;
-			ss << "Network down attempting reconnect to: " << rmd.GetIP() << " Port: " << rmd.GetServerPort() << " ";
-			ss << "Local Information: " << client->GetConnectionInfo();
-			td.AppendMessage(ss.str(), cc.GetAColor(Colors::purple));
-		}
-
+		client.CheckForTimeOut();
+		client.AttemptReconnect();
 		std::string controlMessage = cc.GetCommandd(0);
 		//Timer event sends packets regardless of keystrokes.
 		//Send null string to renderer.
@@ -297,42 +196,11 @@ void cMain::OnTimer(wxTimerEvent& evt)
 		// send the string
 		std::string stlstring = std::string(txt0->GetValue().mb_str());
 		limitStringSize(stlstring, maxStrSize);
-		SendProtectedMessage(controlMessage + stlstring);
+		client.SendMsg(controlMessage + stlstring);
 		
 		loopCounter = 0;
 	}
 	//update looper
 	loopCounter++;
 
-}
-
-bool cMain::NetworkHealthChecker() const
-{
-	if (healthCheck >= 5)
-	{
-		return false;
-	}
-	return true;
-}
-
-void cMain::UpdateHealthChecker(bool updateBool)
-{
-	if (updateBool == true)
-	{
-		//reset if any true condition
-		healthCheck = 0;
-	}
-	else
-	{
-		//add one this time.
-		healthCheck++;
-	}
-}
-
-void cMain::SendProtectedMessage(std::string message)
-{
-	if (client != nullptr)
-	{
-		client->SendMsg(message);
-	}
 }

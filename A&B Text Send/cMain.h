@@ -1,81 +1,11 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "NetClient.h"
-#include "LoadRMData.h"
+
+#include "ClientTCP.h"
 #include <wx/wx.h>
 #include <wx/listctrl.h>
 #include "ListsAndColors.h"
 #include "Terminal.h"
-
-enum class CustomMsgType : uint32_t
-{
-	ServerAccept,
-	ServerDeny,
-	ServerPing,
-	MessageServer,
-	EchoMessage,
-	HealthCheckServer,
-};
-
-class CustomClient : public netcommon::ClientInterface<CustomMsgType>
-{
-public:
-	void PingServer()
-	{	
-		netcommon::message<CustomMsgType> msg;
-		msg.header.id = CustomMsgType::ServerPing;
-		//caution
-		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-		msg << now;
-		m_connection->Send(msg);
-		
-	}
-	void SendMsg(const std::string& messsage)	{
-		netcommon::message<CustomMsgType> msg;
-
-		bool finished = false;
-		for (size_t i = 0; i < messsage.size(); i++)
-		{
-			if (!finished)
-			{
-				msg << messsage[i];
-				if (messsage[i] == '\0')
-				{
-					finished = true;
-					break;
-				}
-			}
-		}
-		msg.header.id = CustomMsgType::MessageServer;
-		m_connection->Send(msg);
-	}
-	void EchoHealthCheck()
-	{
-		netcommon::message<CustomMsgType> msg;
-		msg.header.id = CustomMsgType::EchoMessage;
-		m_connection->Send(msg);
-	}
-
-private:
-	
-};
-
-enum Colors
-{
-	white,
-	red,
-	green,
-	blue,
-	cyan,
-	magenta,
-	yellow,
-	orange,
-	grey,
-	black,
-	purple,
-	darkRed,
-	darkGreen
-};
 
 enum tag
 {
@@ -130,17 +60,12 @@ protected:
 	size_t maxNumMessages = 512;
 
 	//network things
-	LoadRMData rmd;
-	std::unique_ptr<CustomClient> client;
+	ClientTCP client;
 
 	//strings for echo
 	wxString oldString = "";
 
 private:
-	int healthCheck = 0;
-	bool NetworkHealthChecker() const;
-	void UpdateHealthChecker(bool updateBool);
-	void SendProtectedMessage(std::string message);
 	wxTextAttr textDesc;
 	ColorManager cc;
 
