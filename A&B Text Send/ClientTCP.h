@@ -103,14 +103,18 @@ public:
 				{
 				case CustomMsgType::ServerValidated:
 				{
-					tdRef.AppendMessage("Server Validated Connection", cc.GetAColor(Colors::darkGreen));
+					tdRef.AppendMessage("Server Validated Connection", cc.GetAColor(Colors::green));
 					clientValid = true;
 					break;
 				}
 				case CustomMsgType::MessageServer:
 				{
 					std::stringstream ss; 
-					ss << "Echo from server : " << msg.body.data();
+					ss << "Echo from server : ";
+					for (size_t i = 0; i < msg.body.size(); i++)
+					{
+						ss << msg.body[i];
+					}
 					tdRef.AppendMessage(ss.str().c_str(), cc.GetAColor(Colors::purple));
 					break;
 				}
