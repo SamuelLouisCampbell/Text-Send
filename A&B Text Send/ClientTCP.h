@@ -124,6 +124,8 @@ public:
 				}
 				case CustomMsgType::HealthCheckServer:
 				{
+					tdRef.AppendMessage("HealthCheck Poll Recieved", cc.GetAColor(Colors::orange));
+					PollForTermination(1); //reset termination poll
 					break;
 				}
 
@@ -145,15 +147,16 @@ public:
 		}
 	}
 
-	void CheckForTimeOut()
+	void CheckForDisconnect()
 	{
+		PollForTermination(-1);
 		if (client != nullptr)
 		{
 			// detect Timeout
 			if (!client->IsConnected() || !clientValid)
 			{
 				std::stringstream ss;
-				ss << "Client Disconnected - Timeout Counter : " << timeOutCounter;
+				ss << "Client Disconnected - Trying in 4 : " << timeOutCounter;
 				tdRef.AppendMessage(ss.str().c_str(), cc.GetAColor(Colors::red));
 				timeOutCounter++;
 			}
@@ -205,12 +208,35 @@ private:
 		client = nullptr;
 		return false;
 	}
+	void PollForTermination(int add_subtrct)
+	{
+		//send a 1 to reset, sent a -1 to get closer to fail state.
+		if (client != nullptr)
+		{
+			if (add_subtrct >= 1)
+			{
+				pollCounter = 0;
+			}
+			else
+			{
+				pollCounter--;
+			}
 
+			if (pollCounter < -10 && client->IsConnected())
+			{
+				clientStarted = StopClient();
+				pollCounter = 0;
+				clientValid = false;
+				clientStarted = false;
+			}
+		}
+	}
 private:
 	ColorManager cc;
 	LoadRMData rmd;
 	TerminalData& tdRef;
 	std::unique_ptr<CustomClient> client;
+	int pollCounter = 0;
 	bool clientValid = false;
 	bool clientStarted = false;
 	int timeOutCounter = 0;

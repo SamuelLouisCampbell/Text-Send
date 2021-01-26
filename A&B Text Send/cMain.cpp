@@ -182,7 +182,7 @@ void cMain::OnTimer(wxTimerEvent& evt)
 	//resend string data every 60th timer event to save network traffic
 	if (loopCounter >= 60)
 	{
-		client.CheckForTimeOut();
+		client.CheckForDisconnect();
 		client.AttemptReconnect();
 		std::string controlMessage = cc.GetCommandd(0);
 		//Timer event sends packets regardless of keystrokes.
