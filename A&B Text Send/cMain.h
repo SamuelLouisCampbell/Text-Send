@@ -1,9 +1,11 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "UDPClient.h"
-#include "UDPServer.h"
-#include "LoadRMData.h"
+
+#include "ClientTCP.h"
 #include <wx/wx.h>
+#include <wx/listctrl.h>
+#include "ListsAndColors.h"
+#include "Terminal.h"
 
 enum tag
 {
@@ -36,6 +38,9 @@ protected:
 	//timer things
 	wxTimer timer;
 	int loopCounter = 0;
+	std::chrono::system_clock::time_point startTime = std::chrono::system_clock::now();
+
+	int maxStrSize = 500;
 
 	//buttons and boxes etc
 	wxButton* btn0 = nullptr;
@@ -43,22 +48,27 @@ protected:
 	wxFont* font0 = nullptr;
 	wxFont* buttonFont = nullptr;
 	wxFont* terminalFont = nullptr;
+	wxTextCtrl* terminalWindow = nullptr;
 	wxTextCtrl* txt0 = nullptr;
-	wxListBox* terminal = nullptr;
 	wxBoxSizer* sizer0 = nullptr;
 	wxGridSizer* sizer1 = nullptr;
 	wxBoxSizer* sizer2 = nullptr;
 
-	//network things
-	LoadRMData rmd;
-	std::unique_ptr<UDPClient> sender = nullptr;
-	std::unique_ptr<UDPServer> listener = nullptr;
+	//terminal
+	TerminalData td;
+	size_t oldNumMessages = 0;
+	size_t maxNumMessages = 512;
 
+	//network things
+	ClientTCP client;
 
 	//strings for echo
 	wxString oldString = "";
 
 private:
+	wxTextAttr textDesc;
+	ColorManager cc;
+
 	wxDECLARE_EVENT_TABLE();
 };
 

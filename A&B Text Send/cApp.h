@@ -1,11 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "UDPClient.h"
-#include "UDPServer.h"
-#include <wx/wx.h>
 #include "cMain.h"
-
-
+#include <wx/wx.h>
 
 
 class cApp : public wxApp
